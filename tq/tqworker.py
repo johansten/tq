@@ -49,8 +49,6 @@ class Worker(object):
 #-------------------------------------------------------------------------------
 
 def main():
-	r = redis.Redis(host='localhost')
-
 	if 0:
 		keys = r.keys('tq:*')
 		for k in keys:
@@ -78,6 +76,8 @@ def main():
 		worker.unregister()
 
 #-------------------------------------------------------------------------------
+
+r = redis.Redis(host='localhost')
 
 if __name__ == '__main__':
 	main()
