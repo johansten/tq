@@ -79,7 +79,7 @@ def add_task(q, task, **kwargs):
 
 def add(q, func, *args, **kwargs):
 	task	= Task(func, *args, **kwargs)
-	result	= addTask(q, task)
+	result	= add_task(q, task)
 	return result
 
 #-------------------------------------------------------------------------------
