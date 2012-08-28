@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from distutils.core import setup
+from tq import __version__
 
 setup(
     name='tq',
-    version='0.1.0',
+    version=__version__,
     author='Johan Stén',
     author_email='johan.sten@gmail.com',
     packages=['tq'],
