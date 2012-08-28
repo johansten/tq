@@ -1,0 +1,6 @@
+*.pyc
+redis.egg-info
+MANIFEST
+build/
+dist/
+

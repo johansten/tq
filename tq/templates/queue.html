@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TaskQueue</title>
+		<link rel="stylesheet" type="text/css" media="all" href="/static/960.css">
+	</head>
+
+	<script src="/static/jquery.min.js"></script>
+
+	<body style='margin-top:24px'>
+		<div class='container_12'>
+			<div class='grid_12' style="background-color:#eeeeee;padding-left:10px;width:920px;">
+				<h1>${qname}</h1>
+			</div>
+		</div>
+
+		<div class='container_12'>
+			<div class='grid_12'>
+				<br/>
+			</div>
+		</div>
+
+		<div class='container_12'>
+			<div class='grid_6' style="background-color:#eeeeee;padding-left:10px;width:440px;">
+				<h1>Fifo:ed tasks</h1>
+				<table>
+					<tr id='active_tasks'>
+						<td><b>Name</b></td>
+						<td><b>Task</b></td>
+					</tr>
+%for f in fifo:
+					<tr>
+						<td>${f[0]}</td>
+						<td>${f[1]}</td>
+					</tr>
+%endfor
+				</table>
+			</div>
+			<div class='grid_6' style="background-color:#eeeeee;padding-left:10px;width:440px;">
+				<h1>Scheduled tasks</h1>
+				<table>
+					<tr id='active_tasks'>
+						<td><b>Name</b></td>
+						<td><b>Task</b></td>
+					</tr>
+%for s in sched:
+					<tr>
+						<td>${s[0]}</td>
+						<td>${s[1]}</td>
+					</tr>
+%endfor
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

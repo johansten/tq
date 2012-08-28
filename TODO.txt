@@ -1,0 +1,6 @@
+
+- daemonize workers
+- change workers from procesess to threads
+- add rate limiting to queues
+- clean up the API
+- add a queue class

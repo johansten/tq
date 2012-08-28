@@ -1,4 +1,5 @@
-tq
-==
+TQ is a task queue for python
 
-A python task queue.
+TQ lends inspiration from among other the Task Queue in Google App Engine
+(scheduling and rate limiting), python-rq, ...
+

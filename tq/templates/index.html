@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TaskQueue</title>
+		<link rel="stylesheet" type="text/css" media="all" href="/static/960.css">
+	</head>
+
+	<script src="/static/jquery.min.js"></script>
+	<script type="text/javascript">
+		var timerID;
+
+		function update_stats() {
+			$.getJSON('/queues/', function(data) {
+				$('.queue_remove').remove();
+				if (data) {
+					var res = ""
+					for (var i = 0; i != data.length; i++) {
+						res += "<tr class='queue_remove'><td>"
+						res += "<a href='/queue/"
+						res += data[i][0]
+						res += "'>"
+						res += data[i][0]
+						res +="</a></td><td>"
+						res += data[i][1]
+						res += "</td></tr><br/>"
+					}
+					$('#queues').after(res);
+				}
+			});
+
+			$.getJSON('/tasks/', function(data) {
+				$('.task_remove').remove();
+				if (data) {
+					var now = new Date().getTime()/1000;
+					now = Math.floor(now);
+
+					var res = ""
+					for (var i = 0; i != data.length; i++) {
+						res += "<tr class='task_remove'><td>"
+						res += data[i][0]
+						res += "</td><td>"
+						res += data[i][1]
+						res += "</td><td>"
+						res += data[i][2]
+						res += "</td><td class='time' timestamp='"
+						var t = now - parseInt(data[i][3]);
+						res += String(t);
+						res += "'></td></tr><br/>"
+					}
+					$('#active_tasks').after(res);
+					update_times();
+				}
+			});
+		};
+
+		function update_times() {
+			var now = new Date().getTime()/1000;
+			now = Math.floor(now);
+			$('.time').each(function() {
+				var t = $(this).attr('timestamp');
+				t = now - parseInt(t);
+				var res = '';
+				var m = Math.floor(t/60);
+				var s = t - 60*m;
+				if (m != 0) {
+					res += String(m) + 'm ';
+				}
+				if (s != 0) {
+					res += String(s) + 's ';
+				}
+				res += 'ago';
+				$(this).text(res);
+			}
+		)};
+
+		$(document).ready(function() {
+			update_stats();
+			timerID  = window.setInterval("update_stats()", 5000);
+			window.setInterval("update_times()", 1000);
+		});
+	</script>
+
+	<body style='margin-top:24px'>
+		<div class='container_12'>
+			<div class='grid_6' style="background-color:#eeeeee;padding-left:10px;width:440px;">
+				<h1>Queues</h1>
+				<table>
+					<tr id='queues'>
+						<td><b>Name</b></td>
+						<td><b>Number of Tasks</b></td>
+					</tr>
+%for q in queues:
+					<tr>
+						<td>${q[0]}</td>
+						<td>${q[1]}</td>
+					</tr>
+%endfor
+				</table>
+			</div>
+
+			<div class='grid_6' style="background-color:#eeeeee;padding-left:10px;width:440px;">
+				<h1>Workers</h1>
+				<table>
+					<tr>
+						<td><b>Name</b></td>
+						<td><b>State</b></td>
+						<td><b>Queues</b></td>
+					</tr>
+%for w in workers:
+					<tr>
+						<td>${w[0]}</td>
+						<td>${w[1]}</td>
+					</tr>
+%endfor
+				</table>
+			</div>
+		</div>
+
+		<div class='container_12'>
+			<div class='grid_12'>
+				<br/>
+			</div>
+		</div>
+
+		<div class='container_12'>
+			<div class='grid_12' style="background-color:#eeeeee;padding-left:10px;width:920px;">
+				<h1>Active Tasks</h1>
+				<table>
+					<tr id='active_tasks'>
+						<td><b>Worker</b></td>
+						<td><b>Queue</b></td>
+						<td><b>Task</b></td>
+						<td><b>Started</b></td>
+					</tr>
+%for t in tasks:
+					<tr>
+						<td>${t[0]}</td>
+						<td>${t[1]}</td>
+						<td>${t[2]}</td>
+						<td>${t[3]}</td>
+					</tr>
+%endfor
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
