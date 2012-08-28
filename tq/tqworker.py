@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import taskqueue
+import tq
 import redis
 
 import socket
@@ -66,9 +66,9 @@ def main():
 	try:
 		while True:
 			for q in queues:
-				task = taskqueue.dequeue(q)
+				task = tq.taskqueue.dequeue(q)
 				if task is not None:
-					taskqueue.work(worker.hash, task)
+					tq.taskqueue.work(worker.hash, task)
 					break
 			time.sleep(1)
 
