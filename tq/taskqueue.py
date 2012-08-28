@@ -47,7 +47,7 @@ def add_task(q, task, **kwargs):
 			filename 	= frame[1]
 			filename	= os.path.basename(filename)
 			module_name	= filename.split('.')[0]
-			if module_name != __name__:
+			if not __name__.endswith(module_name):
 				break
 
 	func_name = '%s.%s' % (module_name, func_name)
