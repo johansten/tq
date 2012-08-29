@@ -2,10 +2,13 @@
 
 import tq
 import redis
+import importlib
 
 import socket
 import os
 import time
+import pickle
+import traceback
 
 #-------------------------------------------------------------------------------
 
@@ -48,6 +51,37 @@ class Worker(object):
 
 #-------------------------------------------------------------------------------
 
+def work(worker, id):
+
+	try:
+		dict = r.hgetall('tq:task:%s' % id)
+		func_name, args, kwargs = pickle.loads(dict['data'])
+
+		module_name, func_name = func_name.rsplit('.', 1)
+		module = importlib.import_module(module_name)
+
+	#	arg_list = [repr(arg) for arg in args]
+	#	arg_list += ['%s=%r' % (k, v) for k, v in kwargs.items()]
+	#	arguments = ', '.join(arg_list)
+	#	print '%s(%s)' % (func_name, arguments)
+
+		now = int(time.time())
+		r.hset('tq:task:%s' % id, 'started', now)
+		r.hset('tq:worker:%s' % worker, 'task', id)
+
+		result = getattr(module, func_name)(*args, **kwargs)
+	except Exception:
+		tb = traceback.format_exc()
+		r.hset('tq:task:%s' % id, 'traceback', tb)
+		r.rpush('tq:queue:failed', id)
+	else:
+		r.hset('tq:task:%s' % id, 'result', result)
+
+	r.hdel('tq:worker:%s' % worker, 'task')
+	return True
+
+#-------------------------------------------------------------------------------
+
 def main():
 	if 0:
 		keys = r.keys('tq:*')
@@ -68,7 +102,7 @@ def main():
 			for q in queues:
 				task = tq.taskqueue.dequeue(q)
 				if task is not None:
-					tq.taskqueue.work(worker.hash, task)
+					work(worker.hash, task)
 					break
 			time.sleep(1)
 
