@@ -29,7 +29,7 @@ class Worker(object):
 		for q in queues:
 			r.sadd('tq:queue:%s:workers' % q, self.hash)
 
-	def unregister(self):
+	def unregister(self, queues):
 
 		# push any unfinished tasks on failed
 
@@ -73,7 +73,7 @@ def main():
 			time.sleep(1)
 
 	except KeyboardInterrupt:
-		worker.unregister()
+		worker.unregister(queues)
 
 #-------------------------------------------------------------------------------
 
