@@ -8,7 +8,7 @@ setup(
     author='Johan Stén',
     author_email='johan.sten@gmail.com',
     packages=['tq'],
-    scripts=['bin/tqworker.py']
+    scripts=['bin/tqworker.py'],
     url='https://github.com/johansten/tq',
     license='LICENSE.txt',
     description='A python task queue.',
