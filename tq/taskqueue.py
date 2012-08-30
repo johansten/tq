@@ -19,9 +19,8 @@ import os.path
 #			task_id
 #-------------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------------
-
-r = redis.Redis(host='localhost')
+#	TODO: need to figure out how to initialize this properly
+_r = redis.Redis(host='localhost')
 
 #-------------------------------------------------------------------------------
 
@@ -51,7 +50,7 @@ def add_task(q, task, **kwargs):
 	func_name = '%s.%s' % (module_name, func_name)
 	data = pickle.dumps((func_name, task.args, task.kwargs))
 
-	id = r.incr('tq:task:last_id')
+	id = _r.incr('tq:task:last_id')
 	key = 'tq:task:%s' % id
 
 	now = int(time.time())
@@ -59,17 +58,17 @@ def add_task(q, task, **kwargs):
 	dict['data']   = data
 	dict['queued'] = now
 	dict['queue']  = q
-	r.hmset(key, dict)
+	_r.hmset(key, dict)
 
 	if 'time' in kwargs:
 		t = kwargs['time']
 		when = time.mktime(t.timetuple())
-		r.zadd('tq:queue:%s:delayed' % q, id, when)
+		_r.zadd('tq:queue:%s:delayed' % q, id, when)
 	elif 'delay' in kwargs:
 		when = now + kwargs['delay']
-		r.zadd('tq:queue:%s:delayed' % q, id, when)
+		_r.zadd('tq:queue:%s:delayed' % q, id, when)
 	else:
-		r.rpush('tq:queue:%s:fifo' % q, id)
+		_r.rpush('tq:queue:%s:fifo' % q, id)
 
 	return id
 
@@ -87,14 +86,14 @@ def dequeue(q):
 	fifo  = 'tq:queue:%s:fifo' % q
 	delay = 'tq:queue:%s:delayed' % q
 
-	if r.zcard(delay):
+	if _r.zcard(delay):
 		now = int(time.time())
-		id, when = r.zrange(delay, 0, 0, withscores = True)[0]
+		id, when = _r.zrange(delay, 0, 0, withscores = True)[0]
 		if now >= when:
-			r.zrem(delay, id)
+			_r.zrem(delay, id)
 			return id
 
-	id = r.lpop(fifo)
+	id = _r.lpop(fifo)
 	if id is not None:
 		return id
 
