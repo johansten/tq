@@ -19,7 +19,7 @@ class Worker(object):
 		self.r		= r
 		self.queues = queues
 
-	def register(self):
+	def __register(self):
 		dict = {}
 		name = socket.gethostname()
 		if name.endswith('.local'):
@@ -34,7 +34,7 @@ class Worker(object):
 		for q in self.queues:
 			self.r.sadd('tq:queue:%s:workers' % q, self.hash)
 
-	def unregister(self):
+	def __unregister(self):
 
 		# push any unfinished tasks on failed
 
@@ -51,7 +51,7 @@ class Worker(object):
 		self.r.srem('tq:workers', self.hash)
 		self.r.delete('tq:worker:%s' % self.hash)
 
-	def perform_task(self, id):
+	def __perform_task(self, id):
 
 		try:
 			dict = self.r.hgetall('tq:task:%s' % id)
@@ -84,18 +84,18 @@ class Worker(object):
 
 	def work(self):
 
-		self.register()
+		self.__register()
 
 		try:
 			while True:
 				for q in self.queues:
 					task = tq.taskqueue.dequeue(q)
 					if task is not None:
-						self.perform_task(task)
+						self.__perform_task(task)
 						break
 				time.sleep(1)
 
 		except KeyboardInterrupt:
-			self.unregister()
+			self.__unregister()
 
 #-------------------------------------------------------------------------------
