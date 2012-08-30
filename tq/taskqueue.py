@@ -97,11 +97,12 @@ class Queue(object):
 
 def add_task(q, task, **kwargs):
 	return Queue(q).add_task(task, **kwargs)
+
 #-------------------------------------------------------------------------------
 
 def add(q, func, *args, **kwargs):
 	task	= Task(func, *args, **kwargs)
-	result	= add_task(q, task)
+	result	= Queue(q).add_task(task)
 	return result
 
 #-------------------------------------------------------------------------------
