@@ -2,24 +2,38 @@
 
 import tq
 import redis
+import argparse
 
 #-------------------------------------------------------------------------------
 
-#tqworker.py --host=localhost --port=6379 --db=0 --queues=high, default, low
-
 def main():
 
-	r = redis.Redis(host='localhost')
+	parser = argparse.ArgumentParser()
 
-#	keys = r.keys('tq:*')
-#	for k in keys:
-#		r.delete(k)
+	parser.add_argument("--host",
+		default='localhost',
+		help="hostname of the redis instance")
 
-	#	register worker
+	parser.add_argument("--port",
+		type=int,
+		default=6379,
+		help="port number of the redis instance")
 
-	queues = ['high', 'default', 'low']
-	worker = tq.Worker(r, queues)
-	worker.work()
+	parser.add_argument("--db",
+		type=int,
+		default=0,
+		help="db number of the redis instance")
+
+	parser.add_argument('queues',
+		metavar='queue',
+		nargs='+',
+		help='name of a queue to process')
+
+	args = parser.parse_args()
+
+	r = redis.Redis(host=args.host, port=args.port, db=args.db)
+	worker = tq.Worker(r)
+	worker.work(args.queues)
 
 #-------------------------------------------------------------------------------
 
